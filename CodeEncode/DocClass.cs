@@ -1,7 +1,7 @@
 ﻿using System;
 using Word = Microsoft.Office.Interop.Word;
 
-namespace ProjectWord
+namespace CodeEncode
 {
     class DocClass
     {
@@ -25,7 +25,7 @@ namespace ProjectWord
         {
             app = new Word.Application
             {
-                UserName = "Система Шифрования"
+                UserName = "Система нормоконтроля"
             };
             doc = app.Documents.Open(source);
             doc.Activate();
@@ -33,50 +33,53 @@ namespace ProjectWord
         /**
          * Метод закрытия файла
          */
-        public void DocClose()
+        public void DocClose(string source)
         {
             doc.Close();
             doc = null;
-            Console.Read();
-        }
-
-
-
-       // object text = "Ошибка";
-        /**
-         * Метод создает примечание
-         */
-        public void AddComment(Word.Range Range, object text)
-        {
-            doc.Comments.Add(Range, ref text);
-            Console.WriteLine("Все изменилось comments");
+            app.Quit();
+            app = null;
         }
 
 
 
 
 
+
         /**
-         * Метод возвращает количество страниц
-         */
-        public int CountOfPages()
-        {
-            Word.WdStatistic stat = Word.WdStatistic.wdStatisticPages;
-            int Count = doc.ComputeStatistics(stat, Type.Missing);
-            return Count;
-        }
-        /**
-         * Метод выводит на экран текст
+         * Метод возвращает текст документа
          */
         public string ReadText()
         {
             string text = "";
-            for (int i = 1; i < doc.Paragraphs.Count; i++)
+            object start = doc.Content.Start;
+            object end = doc.Content.End;
+            text = doc.Range(ref start, ref end).Text;
+            return text;
+        }
+
+        /**
+         * Метод изменяет текст документа
+         */
+        public void ChangeText(string newText)
+        {
+            object start = doc.Content.Start;
+            object end = doc.Content.End;
+            doc.Range(ref start, ref end).Text = newText;
+        }
+
+
+
+        /**
+         * Метод выводит на экран текст
+         */
+        public void PrintText()
+        {
+            for (int i = 1; i <= doc.Paragraphs.Count; i++)
             {
                 string parText = doc.Paragraphs[i].Range.Text;
-                text += parText;
+                Console.WriteLine(parText);
             }
-            return text;
         }
     }
 }
